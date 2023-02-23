@@ -1,0 +1,37 @@
+﻿<Properties StartupConfiguration="{7379DFB8-D131-EE7A-D176-D89AB8A06B8D}|">
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Tests/PlayMode/PlotTest.cs">
+    <Files>
+      <File FileName="Assets/Tests/PlayMode/BotTest.cs" />
+      <File FileName="Assets/Scripts/Network/PlotGenerator.cs" />
+      <File FileName="Assets/Tests/PlayMode/WeatherGenTest.cs" />
+      <File FileName="Assets/Tests/PlayMode/PlotTest.cs" Line="13" Column="38" />
+      <File FileName="Assets/Scripts/Singleton.cs" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="MiningSolar" expanded="True">
+            <Node name="Assets" expanded="True">
+              <Node name="Scripts" expanded="True">
+                <Node name="Network" expanded="True" />
+                <Node name="Producers" expanded="True" />
+              </Node>
+              <Node name="Tests" expanded="True">
+                <Node name="PlayMode" expanded="True">
+                  <Node name="PlotTest.cs" selected="True" />
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.ItemProperties.EditMode PreferredExecutionTarget="f43fc4e9-b177-464c-af9e-6f4721383bee" />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

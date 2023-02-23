@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scripts", "Scripts.csproj", "{7DF189AA-4505-8A3D-56B0-96D892F776AE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlayMode", "PlayMode.csproj", "{B087EEB9-4408-1E75-5EDE-57D86CE88977}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7DF189AA-4505-8A3D-56B0-96D892F776AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DF189AA-4505-8A3D-56B0-96D892F776AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DF189AA-4505-8A3D-56B0-96D892F776AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DF189AA-4505-8A3D-56B0-96D892F776AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B087EEB9-4408-1E75-5EDE-57D86CE88977}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B087EEB9-4408-1E75-5EDE-57D86CE88977}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B087EEB9-4408-1E75-5EDE-57D86CE88977}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B087EEB9-4408-1E75-5EDE-57D86CE88977}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
