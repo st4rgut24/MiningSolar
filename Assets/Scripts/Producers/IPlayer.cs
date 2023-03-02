@@ -16,10 +16,35 @@ public abstract class IPlayer: MonoBehaviour
     protected List<Plot> plots;
     protected string name;
 
+    protected virtual void Awake()
+    {
+        plots = new List<Plot>();
+    }
+
     protected virtual void Start()
     {
         this.plots = new List<Plot>();
         this.id = Guid.NewGuid().ToString();
+    }
+
+    /// <summary>
+    /// Give a plot to a player
+    /// </summary>
+    /// <param name="plot">A plot of land</param>
+    public virtual void initializePlot(Plot plot)
+    {
+        plots.Add(plot);
+        this.buyItem(Equipment.Type.Miner, plot, plot.startingTile);
+        Vector2Int adjTileLoc = plot.getAdjPlotLoc();
+        this.buyItem(Equipment.Type.PVModule, plot, adjTileLoc); // a solar gets added to an adjacent tile
+    }
+
+    /// <summary>
+    /// Buy an item from the store
+    /// </summary>
+    public void buyItem(Equipment.Type equipmentType, Plot plot, Vector2Int loc, string id = null)
+    {
+        Store.instance.BuyItem(equipmentType, this, plot, loc, id);
     }
 
     public void init(string name)

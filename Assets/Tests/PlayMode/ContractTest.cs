@@ -29,8 +29,8 @@ public class ContractTest
         contractOwner = contractOwnerGameObject.AddComponent<Player>();
         contractOther = contractOtherGameObject.AddComponent<Player>();
          
-        ownerPlot = new Plot(contractOwner, new Vector2Int(1, 1), null);
-        otherPlot = new Plot(contractOther, new Vector2Int(5, 5), null);
+        ownerPlot = new Plot(contractOwner, new Vector2Int(1, 1), null, 1);
+        otherPlot = new Plot(contractOther, new Vector2Int(5, 5), null, 1);
         
         contract = new Contract(MOCK_WATTS, MOCK_PRICE_PER_WATT, duration, ownerPlot);
         contract.addCounterparty(otherPlot);

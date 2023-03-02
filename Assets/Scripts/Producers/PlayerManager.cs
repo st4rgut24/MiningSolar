@@ -6,14 +6,46 @@ using UnityEngine;
 public class PlayerManager : MonoBehaviour
 {
     [SerializeField]
+    private GameObject botPrefab;
+
+    [SerializeField]
+    private GameObject playerPrefab;
+
+    [SerializeField]
     public int analysisTimeFrameLowerBound { get; private set; } = 5;
 
     [SerializeField]
     public int analysisTimeFrameUpperBound { get; private set; } = 10;
 
+    [SerializeField]
+    private float minCashRatio = 0.0f;
+
+    [SerializeField]
+    private float maxCashRatio = 1.0f;
+
+    [SerializeField]
+    private float minSelfSustainRatio = 0.0f;
+
+    [SerializeField]
+    private float maxSelfSustainRatio = 1.0f;
+
     public static PlayerManager instance;
 
     List<IPlayer> agents;
+
+    public class BotProps
+    {
+        public float selfSustainRatio { get; private set; }
+        public float cashRatio { get; private set; }
+        public int analysisTimeFrame { get; private set; }
+
+        public BotProps()
+        {
+            this.analysisTimeFrame = Random.Range(PlayerManager.instance.analysisTimeFrameLowerBound, PlayerManager.instance.analysisTimeFrameUpperBound);
+            this.cashRatio = Random.Range(PlayerManager.instance.minCashRatio, PlayerManager.instance.maxCashRatio);
+            this.selfSustainRatio = Random.Range(PlayerManager.instance.minSelfSustainRatio, PlayerManager.instance.maxSelfSustainRatio);
+        }
+    }
 
     private void Start()
     {
@@ -29,13 +61,14 @@ public class PlayerManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
         }
     }
-    
+
     /// <summary>
-    /// Get a time frame a bot will perform analysis of plot stats using the lower and upper bounds
+    /// Get the properties defining characteristics of a bot
     /// </summary>
-    public int getRandAnalysisTimeFrame()
+    /// <returns>the economic prarameters of a bot</returns>
+    public BotProps getBotProps()
     {
-        return Random.Range(analysisTimeFrameLowerBound, analysisTimeFrameUpperBound);
+        return new BotProps();
     }
 
     /// <summary>
@@ -64,10 +97,12 @@ public class PlayerManager : MonoBehaviour
     /// <param name="isBot">true if creating a bot player</param>
     public void createPlayer(bool isBot)
     {
-        IPlayer player = isBot ? new Bot() : new Player();
+        IPlayer player;
+        //player = isBot ? new Bot() : new Player(); (for testing)
+        GameObject playerGo = isBot ? Instantiate(botPrefab) : Instantiate(playerPrefab);
+        player = playerGo.GetComponent<IPlayer>();
         agents.Add(player);
-        Plot plot = PlotGenerator.instance.GetPlot(player);
-        PlayerTile tile = new PlayerTile(player, PlayerTile.TileType.Empty, plot.startingTile);
-        Map.addPlayerTile(tile);
+        Plot plot = PlotGenerator.instance.GetPlot(player); // a miner gets added to the starting tile
+        player.initializePlot(plot);
     }
 }

@@ -23,9 +23,6 @@ public class RewardGenTest
     [SetUp]
     public void SetUp()
     {
-        var EquipmentFactoryGo = new GameObject();
-        EquipmentFactoryGo.AddComponent<EquipmentFactory>();
-
         var GameManagerGameObject = new GameObject();
         GameManagerGameObject.AddComponent<GameManager>();
 
@@ -49,7 +46,7 @@ public class RewardGenTest
     public IEnumerator RewardGenTestWithEnumeratorPasses()
     {
         Plot plot = pg.GetPlot(player);
-        miner = new AntminerS9(plot);
+        miner = new AntminerS9(plot, null);
         rewardGenerator.addMiner(miner);
 
         const float TEST_BLOCK_TIME = 3;

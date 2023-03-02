@@ -37,7 +37,6 @@ public class SchedulerTest
         botGameObject.AddComponent<Bot>();
         storeGameObject.AddComponent<Store>();
         gameManagerGameObject.AddComponent<GameManager>();
-        equipmentFactoryGo.AddComponent<EquipmentFactory>();
 
         coroutineRunner = testHelper.AddComponent<CoroutineRunner>();
 

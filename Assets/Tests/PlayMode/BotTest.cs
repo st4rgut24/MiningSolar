@@ -16,9 +16,6 @@ public class BotTest
     [UnitySetUp]
     public IEnumerator SetUp()
     {
-        var equipmentFactObj = new GameObject();
-        equipmentFactObj.AddComponent<EquipmentFactory>();
-
         var rewardGenObj = new GameObject();
         rewardGenObj.AddComponent<RewardGenerator>();
 

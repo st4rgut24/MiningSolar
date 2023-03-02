@@ -54,6 +54,10 @@ public class Draw : Singleton<Draw>
             default: 
                 throw new System.Exception("Not a valid tilemap " + gameTile.genericType);
         }
-        targetTilemap.SetTile(gameTile.tilemapLoc, gameTile.getTile());
+        if (targetTilemap != null)
+        {
+            Vector3Int tilemapLoc = new Vector3Int(gameTile.loc.x, gameTile.loc.y, 0);
+            targetTilemap.SetTile(tilemapLoc, gameTile.getTile());
+        }
     }
 }

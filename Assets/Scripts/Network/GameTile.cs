@@ -8,8 +8,6 @@ public class GameTile
 {
     public Vector2Int loc;
 
-    public Vector3Int tilemapLoc;
-
     public Tile mapTile { get; private set; }
 
     public GenericType genericType { get; private set; }
@@ -30,8 +28,7 @@ public class GameTile
 
     public GameTile(Vector2Int loc, Sprite sprite)
     {
-        this.tilemapLoc = new Vector3Int(loc.x, loc.y);
-
+        this.loc = loc;
         mapTile = new Tile(loc, sprite);
         mapTile.sprite = sprite;
     }

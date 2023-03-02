@@ -20,7 +20,8 @@ public class Miner : Equipment
     /// <param name="hashingPower">Terhashes per second</param>
     /// <param name="energyUsage">watts per hour</param>
     /// <param name="price"> price of miner</param>
-    public Miner(float hashingPower, int energyUsage, float price, Plot plot) : base(price, plot, Type.Miner)
+    /// <param name="sprite">image of miner</param>
+    public Miner(float hashingPower, int energyUsage, float price, Plot plot, Sprite sprite) : base(price, plot, Type.Miner, sprite)
     {
         this.rewards = 0;
         this.hashingPower = hashingPower;

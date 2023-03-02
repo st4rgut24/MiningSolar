@@ -6,18 +6,12 @@ using Scripts;
 /// <summary>
 /// A object representing a tile in the map 
 /// </summary>
-public class PlayerTile : Tile
+public class PlayerTile : GameTile
 {
     public IPlayer player;
-    public TileType type;
+    public Equipment.Type type;
     Equipment equipment;
 
-    public enum TileType
-    {
-        Miner,
-        Solar,
-        Empty
-    }
 
     /// <summary>
     /// Create a tile belonging to a player
@@ -27,12 +21,11 @@ public class PlayerTile : Tile
     /// <param name="loc">location of tile</param>
     /// <param name="equipment">equipmnent located on tile if any</param>
     /// <param name="sprite">picture tile overlaid on land</param>
-    public PlayerTile(IPlayer player, TileType tileType, Vector2Int loc, Equipment equipment = null, Sprite sprite = null) : base(loc, sprite)
+    public PlayerTile(IPlayer player, Equipment.Type tileType, Vector2Int loc, Equipment equipment = null, Sprite sprite = null) : base(loc, sprite)
     {
         this.player = player;
         this.type = tileType;
         this.equipment = equipment;
-        this.sprite = sprite;
     }
 
     /// <summary>

@@ -6,6 +6,8 @@ using System;
 
 public class BotPlot : Plot
 {
+    Scheduler scheduler;
+
     Miner defaultMiner;
 
     public PlotReport curPlotReport { get; private set; }
@@ -18,13 +20,14 @@ public class BotPlot : Plot
     float selfSustainRatio;
     float bitcoinProd;
 
-    public BotPlot(Bot player, Vector2Int location, Plot prevAdjPlot) : base(player, location, prevAdjPlot)
+    public BotPlot(Bot player, Vector2Int location, Plot prevAdjPlot, int proximity) : base(player, location, prevAdjPlot, proximity)
     {
         this.bot = player;
         this.botPlotActionList = new List<BotAction>();
         this.selfSustainRatio = player.selfSustainRatio;
 
-        defaultMiner = Store.instance.getDefaultMiner(this);
+        Store.instance.BuyItem(Equipment.Type.Miner, player, this, location);
+
     }
 
     /// <summary>
@@ -38,16 +41,20 @@ public class BotPlot : Plot
         switch (botAction)
         {
             case BotAction.BuyMiner:
-                EquipmentFactory.BuyItem(Equipment.Type.Miner, bot, this, GameManager.instance.NullableLoc);
+                Store.instance.BuyItem(Equipment.Type.Miner, bot, this, GameManager.instance.NullableLoc);
+                Debug.Log("Buy a bitcoin miner");
                 break;
             case BotAction.BuyPanel:
-                EquipmentFactory.BuyItem(Equipment.Type.PVModule, bot, this, GameManager.instance.NullableLoc);
+                Store.instance.BuyItem(Equipment.Type.PVModule, bot, this, GameManager.instance.NullableLoc);
+                Debug.Log("Buy a pv module");
                 break;
             case BotAction.CreateContract:
                 Contract contract = createContract(plotReport);
                 // broadcast contract to a player or bot
+                Debug.Log("broadcast contract to a player or bot");
                 break;
             case BotAction.Save:
+                Debug.Log("save income");
                 break;
             default:
                 break;

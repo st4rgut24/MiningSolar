@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Graphs;
 using UnityEngine;
 
 namespace Scripts
@@ -11,6 +12,10 @@ namespace Scripts
      */
     public class Plot
     {
+        public string id { get; private set; }
+
+        Scheduler scheduler;
+
         public BoundingBox boundingBox { get; private set; }
         public Vector2Int startingTile { get; private set; }
         public Plot prevAdjPlot { get; private set; } // plot set adjacent to on creation (if any)
@@ -33,7 +38,9 @@ namespace Scripts
 
         protected float bitcoinProduction;
 
-        public Plot(IPlayer player, Vector2Int location, Plot prevAdjPlot)
+        private int buffer;
+
+        public Plot(IPlayer player, Vector2Int location, Plot prevAdjPlot, int buffer)
         {
             tiles = new List<Vector2Int>() { location };
             miners = new List<Miner>();
@@ -42,6 +49,8 @@ namespace Scripts
             this.adjacentPlotCount = 0;
             this.prevAdjPlot = prevAdjPlot;
             this.player = player;
+            this.buffer = buffer;
+            id = Guid.NewGuid().ToString();
         }
 
         /// <summary>
@@ -51,7 +60,7 @@ namespace Scripts
         public void changeCashReserves(float deltaCash)
         {
             cashReserves += deltaCash;
-        }
+        } 
 
         /// <summary>
         /// Change the energy reserves of this plot
@@ -137,7 +146,7 @@ namespace Scripts
         /// <param name="buffer"> the buffer surrounding the box defined as the space where no plots belonging to other
         /// players can intrude</param>
         /// <returns>a surrouding rectangle enclosing the player's tiles</returns>
-        public BoundingBox getBoundingBox(int buffer)
+        private BoundingBox createBoundingBox(int buffer)
         {
             int maxXTile = Int32.MinValue;
             int minXTile = Int32.MaxValue;
@@ -165,10 +174,53 @@ namespace Scripts
             return adjacentPlotCount;
         }
 
-        public void setStartingTile(Vector2Int startLoc)
+        /// <summary>
+        /// Update the plot
+        /// </summary>
+        /// <param name="tileLoc">location of tile to add</param>
+        public void addTile(Vector2Int tileLoc)
         {
-            this.tiles = new List<Vector2Int> { startLoc };
+            this.tiles.Add(tileLoc);
+        }
 
+        /// <summary>
+        /// Get a tile location that borders this plot
+        /// </summary>
+        /// <param name="plot">The plot containing locations of its land</param>
+        /// <returns>the bordering tile location that extends this plot</returns>
+        public Vector2Int getAdjPlotLoc()
+        {
+            List<Vector2Int> fourDir = new List<Vector2Int>() { Vector2Int.up, Vector2Int.left, Vector2Int.down, Vector2Int.right };
+            List<Vector2Int> tiles = getTiles();
+            for (int i = 0; i < tiles.Count; i++)
+            {
+                Vector2Int tile = tiles[i];
+                for (int d = 0; d < fourDir.Count; d++)
+                {
+                    Vector2Int dir = fourDir[d];
+                    Vector2Int adjTile = tile + dir;
+                    bool isBlocked = Map.isPlayerTileInBufferZone(adjTile, id) || Map.isTileOccupied(adjTile);
+                    if (!isBlocked)
+                    {
+                        return adjTile;
+                    }
+                }
+            }
+            return GameManager.instance.NullableLoc; // returrn a falsy vector2int value indicating the plot is landlocked
+        }
+
+        /// <summary>
+        /// Remove a tile at location
+        /// </summary>
+        /// <param name="tileLoc">the locatin of tile to be removed</param>
+        private void removeTile(Vector2Int tileLoc)
+        {
+            if (boundingBox != null)
+            {
+                // remove buffered locs from the map
+            }
+            tiles.Remove(tileLoc);
+            boundingBox = createBoundingBox(buffer);
         }
 
         public List<Vector2Int> getTiles()

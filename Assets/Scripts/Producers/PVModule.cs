@@ -11,7 +11,7 @@ public class PVModule : Equipment
     public int wattHours { get; private set; }
     public int watts { get; private set; }
 
-    public PVModule(float price, int wattHours, Plot plot) : base(price, plot, Type.PVModule)
+    public PVModule(float price, int wattHours, Plot plot, Sprite sprite) : base(price, plot, Type.PVModule, sprite)
     {
         this.wattHours = wattHours;
         this.watts = (int)(wattHours * (GameManager.instance.energyDataCollectPeriod / Constants.MIN_IN_HOUR));

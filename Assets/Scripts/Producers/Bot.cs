@@ -2,6 +2,7 @@ using Scripts;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public enum BotAction
 {
@@ -14,28 +15,39 @@ public enum BotAction
 
 public class Bot : IPlayer
 {
+    [SerializeField]
+    GameObject schedulerPrefab;
+
+    public PlayerManager.BotProps botProps { get; private set; }
     public int analysisTimeFrame { get; private set; } // period in mins bewteen analysis of plots
     public float selfSustainRatio { get; private set; }
+    public float cashRatio { get; private set; }
 
-    // TODO: Create the schedulers in a new class called BotGenerator.cs
-    Scheduler scheduler;
-    List<BotAction> botActionList; 
+    List<BotAction> botActionList;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        botProps = PlayerManager.instance.getBotProps();
+    }
 
     protected override void Start()
     {
         base.Start();
         botActionList = new List<BotAction>();
-        analysisTimeFrame = PlayerManager.instance.getRandAnalysisTimeFrame();
     }
 
     /// <summary>
-    /// Start scheduling actions for a bot's plot
+    /// In addition to creating a plot bots schedule actions for the plto
     /// </summary>
-    /// <param name="plot">The plot of land belonging to bot</param>
-    /// <param name="cashRatio"></param>
-    public void initScheduler(BotPlot plot, float cashRatio)
+    /// <param name="plot">The new plot</param>
+    public override void initializePlot(Plot plot)
     {
-        this.scheduler.initialize(plot, selfSustainRatio, cashRatio, analysisTimeFrame);
+        base.initializePlot(plot);
+        GameObject schedulerGo = Instantiate(schedulerPrefab, transform);
+        Scheduler scheduler = schedulerGo.GetComponent<Scheduler>();
+        scheduler.initialize((BotPlot) plot, botProps.selfSustainRatio, botProps.cashRatio, botProps.analysisTimeFrame);
+
     }
 
     /// <summary>

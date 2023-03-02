@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
 using UnityEngine;
 
 namespace Scripts
@@ -16,12 +17,14 @@ namespace Scripts
 
         static Dictionary<Vector2Int, PlayerTile> playerTileDict;
         static Dictionary<Vector2Int, WeatherTile> weatherTileDict;
+        static Dictionary<string, HashSet<Vector2Int>> bufferedZoneDict; // <plot id, set of plot locations>
 
         static Map()
         {
             weatherTileDict = new Dictionary<Vector2Int, WeatherTile>();
             playerTileDict = new Dictionary<Vector2Int, PlayerTile>();
             allPlotsBoundingBox = new BoundingBox(int.MaxValue, int.MaxValue, int.MinValue, int.MinValue);
+            bufferedZoneDict = new Dictionary<string, HashSet<Vector2Int>>();
         }
 
         /// <summary>
@@ -49,6 +52,28 @@ namespace Scripts
                 allPlotsBoundingBox.setMaxY(location.y);
             }
             setMinBounds(allPlotsBoundingBox);
+        }
+
+        /// <summary>
+        /// Update the set of tile locations that are off-limits to new plots
+        /// </summary>
+        /// <param name="boundingBox">A bounding box defining the buffer of an existing plot</param>
+        public static void addBufferedTiles(BoundingBox boundingBox)
+        {
+            if (boundingBox.id != null)
+            {
+                List<Vector2Int> bufferedLocs = boundingBox.getBufferedLocs();
+                if (!bufferedZoneDict.ContainsKey(boundingBox.id))
+                {
+                    bufferedZoneDict.Add(boundingBox.id, new HashSet<Vector2Int>());
+                }
+                HashSet<Vector2Int> bufferedZone = bufferedZoneDict[boundingBox.id];
+                for (int i = 0; i < bufferedLocs.Count; i++)
+                {
+                    //Debug.Log("add buffered loc " + bufferedLocs[i]);
+                    bufferedZone.Add(bufferedLocs[i]);
+                }
+            }
         }
 
         /// <summary>
@@ -88,26 +113,45 @@ namespace Scripts
         /// Add a player tile to the map if its location is not blocked
         /// </summary>
         /// <param name="tile">the tile to place</param>
-        /// <returns></returns>
-        public static bool addPlayerTile(PlayerTile tile)
+        /// <returns>true if player tile is added</returns>
+        public static void addPlayerTile(PlayerTile tile)
         {
-            bool isEmptyTile = !isPlayerTileExist(tile.loc);
-            if (isEmptyTile)
-            {
-                playerTileDict[tile.loc] = tile;
-                updateBoundingBox(tile.loc);
-            }
-            return isEmptyTile;
+            playerTileDict[tile.loc] = tile;
+            updateBoundingBox(tile.loc);
+            // draw a land tile and the player sprite overlaid on it
+            Draw.instance.drawLandTile(tile.loc);
+            Draw.instance.drawTile(tile);
+            Debug.Log("Draw a tile of type " + tile.type + " at location " + tile.loc);
         }
 
         /// <summary>
-        /// Is there a player tile at a location
+        /// Is the cell occupied by a player tile
+        /// </summary>
+        /// <param name="loc">location fo the tile</param>
+        /// <returns></returns>
+        public static bool isTileOccupied(Vector2Int loc)
+        {
+            return playerTileDict.ContainsKey(loc);
+        }
+
+        /// <summary>
+        /// Is this tile location off limits for a new player tile
         /// </summary>
         /// <param name="loc">location of tile</param>
         /// <returns>true if tile exists already</returns>
-        public static bool isPlayerTileExist(Vector2Int loc)
+        public static bool isPlayerTileInBufferZone(Vector2Int loc, string id)
         {
-            return playerTileDict.ContainsKey(loc);
+            foreach (KeyValuePair<string, HashSet<Vector2Int>> bufferedZone in bufferedZoneDict)
+            {
+                if (id != bufferedZone.Key)
+                {
+                    if (bufferedZone.Value.Contains(loc))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     }
 

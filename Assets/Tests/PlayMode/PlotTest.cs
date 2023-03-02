@@ -75,9 +75,11 @@ public class PlotTest
             }
             else
             {
-                int xDist = Mathf.Abs(plot.startingTile.x - plot.prevAdjPlot.startingTile.x);
-                int yDist = Mathf.Abs(plot.startingTile.y - plot.prevAdjPlot.startingTile.y);
-                bool isDistCorrect = xDist == proximity || yDist == proximity;
+                int prevPlotBuffer = plot.prevAdjPlot.boundingBox.buffer;
+                int xDist = Mathf.Abs(plot.startingTile.x - plot.prevAdjPlot.startingTile.x) - 1;
+                int yDist = Mathf.Abs(plot.startingTile.y - plot.prevAdjPlot.startingTile.y) - 1;
+                Debug.Log("x dist " + xDist + " y dist " + yDist + " Proximity " + proximity);
+                bool isDistCorrect = xDist == prevPlotBuffer || yDist == prevPlotBuffer;
                 Assert.IsTrue(isDistCorrect);
             }
     }

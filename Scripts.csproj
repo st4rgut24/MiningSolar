@@ -66,7 +66,6 @@
     <Compile Include="Assets/Scripts/Utils/Constants.cs" />
     <Compile Include="Assets/Scripts/Producers/PVModule.cs" />
     <Compile Include="Assets/Scripts/Producers/PlayerManager.cs" />
-    <Compile Include="Assets/Scripts/Producers/EquipmentFactory.cs" />
     <Compile Include="Assets/Scripts/Network/Cloud.cs" />
     <Compile Include="Assets/Scripts/Network/Generator.cs" />
     <Compile Include="Assets/Scripts/Producers/Sentiment.cs" />
@@ -85,6 +84,7 @@
     <Compile Include="Assets/Scripts/Network/LandGenerator.cs" />
     <Compile Include="Assets/Scripts/Producers/Contract.cs" />
     <Compile Include="Assets/Scripts/Producers/PlotReport.cs" />
+    <Compile Include="Assets/Scripts/Test/CreatePlayerBtnTest.cs" />
     <Compile Include="Assets/Scripts/Producers/BoundingBox.cs" />
     <Compile Include="Assets/Scripts/Network/WeatherTile.cs" />
     <Compile Include="Assets/Scripts/Producers/Bot.cs" />
@@ -95,6 +95,7 @@
     <Compile Include="Assets/Scripts/Network/PlotGenerator.cs" />
     <Compile Include="Assets/Scripts/Producers/Equipment.cs" />
     <Compile Include="Assets/Scripts/Network/RewardGenerator.cs" />
+    <Compile Include="Assets/Scripts/Utils/StaticCoroutine.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets/Scripts/Scripts.asmdef" />

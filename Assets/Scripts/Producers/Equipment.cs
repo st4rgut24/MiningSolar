@@ -22,12 +22,12 @@ public class Equipment
         PVModule
     }
 
-    public Equipment(float price, Plot plot, Type equipmentType)
+    public Equipment(float price, Plot plot, Type equipmentType, Sprite sprite)
     {
         instId = id;
         this.plot = plot;
         this.price = price;
         this.type = equipmentType;
-        this.sprite = EquipmentFactory.instance.getSpriteFromId(instId);
+        this.sprite = sprite;
     }
 }

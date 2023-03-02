@@ -20,6 +20,8 @@ public class WeatherGenTest
     [SetUp]
     public void SetUp()
     {
+        var drawGo = new GameObject();
+        drawGo.AddComponent<Draw>();
 
         var go = new GameObject();
         wg = go.AddComponent<WeatherGenerator>();
@@ -33,7 +35,7 @@ public class WeatherGenTest
         var playerGo = new GameObject();
         Player player = playerGo.AddComponent<Player>();
         Vector2Int playerLoc = new Vector2Int(1, 1);
-        Map.addPlayerTile(new PlayerTile(player, PlayerTile.TileType.Miner, playerLoc, null));
+        Map.addPlayerTile(new PlayerTile(player, Equipment.Type.Miner, playerLoc, null));
     }
 
     /// <summary>

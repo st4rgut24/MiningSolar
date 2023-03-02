@@ -33,8 +33,14 @@ public class Scheduler: MonoBehaviour
         this.selfSustainRatio = selfSustainRatio;
         this.cashRatio = cashRatio;
         this.plot = plot;
+
+        StartCoroutine(ScheduleActions());
     }
 
+    /// <summary>
+    /// Start scheduling actions for a bot's plot at a predefined interval using passed-in plot parameters
+    /// </summary>
+    /// <returns></returns>
     public IEnumerator ScheduleActions()
     {
         while (true)
