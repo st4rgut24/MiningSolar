@@ -8,7 +8,9 @@ using Scripts;
 public class Miner : Equipment
 {
 
-    public float hashingPower { get; private set; }
+    public float maxHashingPower { get; private set; }
+    public float activeHashingPower { get; private set; } // the current hashing power of the miner
+
     public int energyUsage { get; private set; } // energy usage per hour
     public float miningEfficiency { get; private set; }
     public float rewards { get; private set; }  // rewards earned over miner lifetime denominated in bitcoin
@@ -23,23 +25,28 @@ public class Miner : Equipment
     /// <param name="sprite">image of miner</param>
     public Miner(float hashingPower, int energyUsage, float price, Plot plot, Sprite sprite) : base(price, plot, Type.Miner, sprite)
     {
+        this.maxHashingPower = hashingPower;
+        this.activeHashingPower = hashingPower;
+
         this.rewards = 0;
-        this.hashingPower = hashingPower;
         this.energyUsage = energyUsage;
         miningEfficiency = energyUsage / hashingPower;
         watts = energyUsage * (int)(GameManager.instance.energyDataCollectPeriod / Constants.MIN_IN_HOUR);
 
         GameManager.instance.StartCoroutine(spendEnergy());
+        //Debug.Log("Created miner with id " + instId);
     }
 
     /// <summary>
     /// Win the coinbase, collect earnings
     /// </summary>
     /// <param name="coinbase">amount of bitcoin as miner reward</param>
-    public void collectCoinbase(float coinbase)
+    public void collectCoinbase(float coinbase, float bitcoinPrice)
     {
-        rewards += coinbase;
-        plot.changeCashReserves(coinbase);
+        float dollarAmount = coinbase * bitcoinPrice;
+        rewards += dollarAmount;
+        plot.changeCashReserves(dollarAmount);
+        plot.changeBitcoinProd(coinbase);
     }
 
     /// <summary>
@@ -48,6 +55,8 @@ public class Miner : Equipment
     private IEnumerator spendEnergy()
     {
         yield return new WaitForSeconds(GameManager.instance.energyDataCollectPeriod);
-        this.plot.changeEnergyReserves(-watts);
+        bool isEnoughEnergy = this.plot.changeEnergyReserves(-watts);
+        // power down the miner if there isn't enough energy produced by this plot of land
+        this.activeHashingPower = isEnoughEnergy ? maxHashingPower : 0;
     }
 }

@@ -58,7 +58,7 @@ public class BotTest
         botPlot = pg.GetPlot(bot);
         botPlot.addMiner(Store.instance.getMiner(AntminerS9.id, botPlot));
         int upperBoundMinerCapacity = PlotReport.getMinerCapacity(botPlot.miners, playerManager.analysisTimeFrameUpperBound);
-        botPlot.changeSelfProducedEnergy(upperBoundMinerCapacity + 1); 
+        botPlot.changeEnergyReserves(upperBoundMinerCapacity + 1); 
         contract = new Contract(100, 1, 10, botPlot);
         bool isAccepted = bot.negotiateContract(contract);
         Assert.IsFalse(isAccepted);
@@ -87,7 +87,7 @@ public class BotTest
         botPlot = pg.GetPlot(bot);
         botPlot.addMiner(Store.instance.getMiner(AntminerS9.id, botPlot));
         int contractDurationInBlocks = 10;
-        float maxExpectedRewardPerBlock = RewardGenerator.REWARD_SIZE * RewardGenerator.bitcoinExchangeRate * contractDurationInBlocks;
+        float maxExpectedRewardPerBlock = RewardGenerator.REWARD_SIZE * RewardGenerator.BITCOIN_PRICE * contractDurationInBlocks;
         float pricePerWattHour = maxExpectedRewardPerBlock + 1;
         contract = new Contract(1, pricePerWattHour, 10, botPlot);
         bool isAccepted = bot.negotiateContract(contract);

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Scripts;
 
 /// <summary>
 /// A report generated for a plot on its earnings and production metrics
@@ -15,52 +16,61 @@ public class PlotReport
 
     public float equipmentValue { get; private set; }
     public int maxEnergy { get; private set; }
-    public int selfGenEnergyThisReport { get; private set; }
+
     public int totalEnergyThisReport { get; private set; }
-    public float curBitcoinProd { get; private set; }
+    public int importedEnergyThisReport { get; private set; }
+
+    public float bitcoinProdThisReport { get; private set; }
+
     public int targetSelfGenEnergy { get; private set; }
-    public int cumTotalEnergy { get; private set; }
-    public int cumEnergyProd { get; private set; }
-    public float cumBitcoinProd { get; private set; }
     public bool selfSustainable { get; private set; }
 
+    public EnergyInfo energyInfo { get; private set; }
+    public BitcoinInfo bitcoinInfo { get; private set; }
 
+    /// <summary>
+    /// Energy stats for a SINGLE report period
+    /// </summary>
     public class EnergyInfo
     {
         public int cumSelfProducedEnergy { get; private set; }
-        public int prevSelfProducedEnergy { get; private set; }
-        public int totalEnergy { get; private set; }
-        public int prevTotalEnergy { get; private set; }
+        public int cumImportedEnergy { get; private set; }
+        public int cumTotalEnergy { get; private set; }
+
+        public int SelfProducedEnergy { get; private set; }
+        public int ImportedEnergy { get; private set; }
+        public int TotalEnergy { get; private set; }
 
         /// <summary>
         /// Energy related info in the plot report
         /// </summary>
-        /// <param name="cumSelfProducedEnergy">The energy produced by the plot so far</param>
-        /// <param name="prevSelfProducedEnergy">The amount of energy produced in the last plot report</param>
-        /// <param name="totalEnergy">The total amount of energy including imported energy</param>
-        /// <param name="prevTotalEnergy">The total amount of energy produced up until the previous plot report</param>
-        public EnergyInfo(int cumSelfProducedEnergy, int prevSelfProducedEnergy, int totalEnergy, int prevTotalEnergy) {
+        public EnergyInfo(int cumSelfProducedEnergy, int cumImportedEnergy, int cumTotalEnergy, PlotReport prevPlotReport) {
+
+            // find the delta between the last plot report and this plot report's energy stats
+            this.SelfProducedEnergy = cumSelfProducedEnergy - prevPlotReport?.energyInfo.SelfProducedEnergy ?? 0;
+            this.ImportedEnergy = cumImportedEnergy - prevPlotReport?.energyInfo.ImportedEnergy ?? 0;
+            this.TotalEnergy = cumTotalEnergy - prevPlotReport?.energyInfo.TotalEnergy ?? 0;
+
             this.cumSelfProducedEnergy = cumSelfProducedEnergy;
-            this.prevSelfProducedEnergy= prevSelfProducedEnergy;
-            this.totalEnergy = totalEnergy;
-            this.prevTotalEnergy = prevTotalEnergy;
+            this.cumImportedEnergy = ImportedEnergy;
+            this.cumTotalEnergy = cumTotalEnergy;
         }
     }
 
     public class BitcoinInfo
     {
+        public float BitcoinProducedThisReport { get; private set; }
         public float cumBitcoinProduced { get; private set; }
-        public float prevBitcoinProduced { get; private set; }
 
         /// <summary>
         /// The plot's bitcoin production info
         /// </summary>
         /// <param name="cumBitcoinProduced">Amount of bitcoin produced by the plot so far</param>
         /// <param name="prevBitcoinProduced">Amount of bitcoin mined during the previous plot report period</param>
-        public BitcoinInfo(float cumBitcoinProduced, float prevBitcoinProduced)
+        public BitcoinInfo(float cumBitcoinProduced, PlotReport prevPlotReport)
         {
+            this.BitcoinProducedThisReport = cumBitcoinProduced - prevPlotReport?.bitcoinInfo.cumBitcoinProduced ?? 0;
             this.cumBitcoinProduced = cumBitcoinProduced;
-            this.prevBitcoinProduced= prevBitcoinProduced;
         }
     }
 
@@ -72,21 +82,19 @@ public class PlotReport
     /// <param name="modules">modules on a plot</param>
     /// <param name="selfSustainRatio">self sustainable ratio of the plot</param>
     /// <param name="analysisTimeFrame">time frame over which analysis was made</param>
-    public PlotReport(float cash, EnergyInfo energyStats, BitcoinInfo bitcoinStats, List<Miner> miners, List<PVModule> modules, float selfSustainRatio, int analysisTimeFrame)
+    public PlotReport(float cash, EnergyInfo energyStats, BitcoinInfo bitcoinStats, List<Miner> miners, List<PVModule> modules, PlayerManager.BotProps botProps)
     {
+        this.energyInfo = energyStats;
+        this.bitcoinInfo = bitcoinStats;
+
         this.cash = cash;
-        this.selfSustainRatio = selfSustainRatio;
-        cumEnergyProd = energyStats.cumSelfProducedEnergy;
-        cumBitcoinProd = bitcoinStats.cumBitcoinProduced;
+        this.selfSustainRatio = botProps.selfSustainRatio;
 
         timestamp  = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
         equipmentValue = getEquipmentValue(miners, modules);
 
-        maxEnergy = getMinerCapacity(miners, analysisTimeFrame);
-        selfGenEnergyThisReport = energyStats.cumSelfProducedEnergy - energyStats.prevSelfProducedEnergy;
-        totalEnergyThisReport = energyStats.totalEnergy - energyStats.prevTotalEnergy;
+        maxEnergy = getMinerCapacity(miners, botProps.analysisTimeFrame);
         
-        curBitcoinProd = bitcoinStats.cumBitcoinProduced - bitcoinStats.prevBitcoinProduced;
         targetSelfGenEnergy = (int)(maxEnergy * selfSustainRatio);
     }
 
@@ -96,16 +104,39 @@ public class PlotReport
     /// <returns>The amount of excess energy in watts</returns>
     public int getSurplusEnergy()
     {
-        return isSelfSustainable() ? (selfGenEnergyThisReport - targetSelfGenEnergy) : 0;
+        return isSelfSustainable() ? (this.energyInfo.SelfProducedEnergy - targetSelfGenEnergy) : 0;
     }
 
     /// <summary>
     /// Calculate the value of a watt in terms of bitcoin production during this report's period
     /// </summary>
+    /// <param name="botActiveWatts">Amount of watts the bot's plot is producing currently</param>
     /// <returns>The average watt cost in usd</returns>
-    public float getAvgWattCost()
+    public float getAvgWattCost(int botActiveWatts)
     {
-        return curBitcoinProd / totalEnergyThisReport * RewardGenerator.bitcoinExchangeRate;
+        if (botActiveWatts == 0)
+        {
+            throw new Exception("Attempting to calculate avg watt cost but the amount of watts is 0");
+        }
+        float totalEnergyProd = getTotalEnergyProduction();
+        // proportion of total active wattage this player's plot owns
+        float energyPct = (float)botActiveWatts / totalEnergyProd;
+        float dollarReward = RewardGenerator.instance.calculateReward(energyPct);
+        return dollarReward / botActiveWatts;
+    }
+
+    /// <summary>
+    /// Get the total energy production across all plots
+    /// </summary>
+    /// <returns>watt hours of production</returns>
+    public float getTotalEnergyProduction()
+    {
+        float totalActiveWatts = 0;
+        PlotGenerator.instance.plots.ForEach((plot) =>
+        {
+            totalActiveWatts += plot.getEnergyProd();
+        });
+        return totalActiveWatts;
     }
 
     /// <summary>
@@ -156,6 +187,7 @@ public class PlotReport
     /// <returns>true if bot should invest in miners, false if bot should buy panels instead</returns>
     public bool isSelfSustainable()
     {
-        return targetSelfGenEnergy < selfGenEnergyThisReport;
+        Debug.Log("is Self Sustainable if self generated energy " + this.energyInfo.SelfProducedEnergy + " is greater than target energy generation " + targetSelfGenEnergy);
+        return targetSelfGenEnergy < this.energyInfo.SelfProducedEnergy;
     }
 }

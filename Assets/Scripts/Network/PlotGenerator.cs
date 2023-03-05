@@ -12,6 +12,9 @@ namespace Scripts
     public class PlotGenerator : Singleton<PlotGenerator>
     {
         [SerializeField]
+        public int defaultCashReserves = 1000;
+
+        [SerializeField]
         float decentralizedPct = .5f; // measures how decentralized plot placement is (1 is most decentralized, 0 is totally random)
 
         public int proximity; // how far away a plot should be placed from another's plot
@@ -159,7 +162,7 @@ namespace Scripts
             }
             if (newPlot.prevAdjPlot != null) // the first tile will be isolated
             {
-                Debug.Log("adj plot is at " + newPlot.prevAdjPlot.startingTile);
+                //Debug.Log("adj plot is at " + newPlot.prevAdjPlot.startingTile);
                 newPlot.incrementAdjPlotCount();
                 newPlot.prevAdjPlot.incrementAdjPlotCount(); // check that there is an adjacent Plot first
             }

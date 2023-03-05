@@ -70,7 +70,7 @@ namespace Scripts
                 HashSet<Vector2Int> bufferedZone = bufferedZoneDict[boundingBox.id];
                 for (int i = 0; i < bufferedLocs.Count; i++)
                 {
-                    //Debug.Log("add buffered loc " + bufferedLocs[i]);
+                    Debug.Log("add buffered loc " + bufferedLocs[i]);
                     bufferedZone.Add(bufferedLocs[i]);
                 }
             }
@@ -121,7 +121,6 @@ namespace Scripts
             // draw a land tile and the player sprite overlaid on it
             Draw.instance.drawLandTile(tile.loc);
             Draw.instance.drawTile(tile);
-            Debug.Log("Draw a tile of type " + tile.type + " at location " + tile.loc);
         }
 
         /// <summary>
@@ -147,10 +146,12 @@ namespace Scripts
                 {
                     if (bufferedZone.Value.Contains(loc))
                     {
+                        Debug.Log("tile at " + loc + " is in buffered zone");
                         return true;
                     }
                 }
             }
+            Debug.Log("tile at " + loc + " is not in buffered zone");
             return false;
         }
     }

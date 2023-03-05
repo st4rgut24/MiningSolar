@@ -28,15 +28,16 @@ namespace Scripts
         protected List<Vector2Int> tiles; // location of tiles making up the plot
 
         // received energy in wattHours
-        protected int selfProducedEnergy;
-        protected int importedEnergy;
+        protected int cumSelfProducedEnergy = 0;
+        protected int cumImportedEnergy = 0;
+
+        public float cumBitcoinProduced = 0;
 
         protected float energyReserves;
         protected float cashReserves;
 
         protected int adjacentPlotCount; // count of nearby plots belonging to other players
 
-        protected float bitcoinProduction;
 
         private int buffer;
 
@@ -51,6 +52,9 @@ namespace Scripts
             this.player = player;
             this.buffer = buffer;
             id = Guid.NewGuid().ToString();
+
+            cashReserves = PlotGenerator.instance.defaultCashReserves;
+            this.boundingBox = createBoundingBox(buffer, id);
         }
 
         /// <summary>
@@ -59,35 +63,52 @@ namespace Scripts
         /// <param name="deltaCash">The change in the cash reserves</param>
         public void changeCashReserves(float deltaCash)
         {
+            if (cashReserves + deltaCash < 0)
+            {
+                throw new Exception("Can't have a negative balance");
+            }
             cashReserves += deltaCash;
-        } 
+        }
 
         /// <summary>
-        /// Change the energy reserves of this plot
+        /// Change the amount of bitcoin produced from this plot
         /// </summary>
-        /// <param name="deltaWatts"></param>
-        public void changeEnergyReserves(int deltaWatts)
+        /// <param name="bitcoin"></param>
+        public void changeBitcoinProd(float deltaBitcoin)
         {
-            energyReserves += deltaWatts;
+            if (deltaBitcoin < 0)
+            {
+                throw new Exception("A negative bitcoin production is not allowed");
+            }
+            this.cumBitcoinProduced += deltaBitcoin;
+        }
+
+        /// <summary>
+        /// Tally the cumulative energy produced on this plot
+        /// </summary>
+        /// <param name="wattsAdded">Number of watts added</param>
+        public void addSelfGeneratedEnergy(int wattsAdded)
+        {
+            cumSelfProducedEnergy += wattsAdded;
         }
 
         /// <summary>
         /// Change the amount of self produced energy
         /// </summary>
         /// <param name="deltaEnergy">The change in self produced energy</param>
-        public void changeSelfProducedEnergy(int deltaEnergy)
+        public bool changeEnergyReserves(int deltaEnergy)
         {
-            selfProducedEnergy += deltaEnergy;
-            changeEnergyReserves(deltaEnergy);
-        }
-
-        /// <summary>
-        /// Amount of energy imported and self produced
-        /// </summary>
-        /// <returns>Total energy used on plot</returns>
-        public int getTotalEnergyProduction()
-        {
-            return selfProducedEnergy + importedEnergy;
+            // cannot spend more energy than are in the reserves
+            if (deltaEnergy + energyReserves < 0)
+            {
+                return false;
+            }
+            else
+            {
+                energyReserves += deltaEnergy;
+                Debug.Log("updating energy reserves to " + energyReserves);
+                return true;
+            }
         }
 
         /// <summary>
@@ -105,8 +126,7 @@ namespace Scripts
         /// <param name="importedWattHours"></param>
         public void importEnergy(int importedWattHours)
         {
-            importedEnergy += importedWattHours;
-            changeEnergyReserves(importedWattHours);
+            cumImportedEnergy += importedWattHours;
         }
 
         /// <summary>
@@ -120,14 +140,25 @@ namespace Scripts
         }
 
         /// <summary>
-        /// Get hash power of all miners on this plot
+        /// Get active hash power of all miners on this plot
         /// </summary>
         /// <returns>Total hash power</returns>
         public float getHashPower()
         {
             float hashPow = 0;
-            miners.ForEach((miner) => { hashPow += miner.hashingPower; });
+            miners.ForEach((miner) => { hashPow += miner.activeHashingPower; });
             return hashPow;
+        }
+
+        /// <summary>
+        /// Get the active watt hours of all pv modules on this plot
+        /// </summary>
+        /// <returns>total watt hours</returns>
+        public int getEnergyProd()
+        {
+            int totalActivePower = 0;
+            modules.ForEach((module) => { totalActivePower += module.activeWattHours; });
+            return totalActivePower;
         }
 
         public string getOwnerId()
@@ -144,9 +175,10 @@ namespace Scripts
         /// Get the convex shape of a player to define the edges of their plot
         /// </summary>
         /// <param name="buffer"> the buffer surrounding the box defined as the space where no plots belonging to other
+        /// <param name="id"/> id of the bounding box matches the plot's<param>
         /// players can intrude</param>
         /// <returns>a surrouding rectangle enclosing the player's tiles</returns>
-        private BoundingBox createBoundingBox(int buffer)
+        private BoundingBox createBoundingBox(int buffer, string id)
         {
             int maxXTile = Int32.MinValue;
             int minXTile = Int32.MaxValue;
@@ -161,7 +193,7 @@ namespace Scripts
                 if (tileLoc.x > maxXTile) { maxXTile = tileLoc.x; }
                 if (tileLoc.y > maxYTile) { maxYTile = tileLoc.y; }
             }
-            return new BoundingBox(minXTile, minYTile, maxXTile, maxYTile, buffer);
+            return new BoundingBox(minXTile, minYTile, maxXTile, maxYTile, buffer, id);
         }
 
         public List<Miner> getMiners()
@@ -220,7 +252,7 @@ namespace Scripts
                 // remove buffered locs from the map
             }
             tiles.Remove(tileLoc);
-            boundingBox = createBoundingBox(buffer);
+            boundingBox = createBoundingBox(buffer, id);
         }
 
         public List<Vector2Int> getTiles()

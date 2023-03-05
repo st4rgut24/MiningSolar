@@ -65,15 +65,25 @@ public class Scheduler: MonoBehaviour
         {
             BotAction buyAction = isSelfSustain ? BotAction.BuyMiner : BotAction.BuyPanel;
             Equipment equipment = BotAction.BuyMiner == buyAction ? Store.instance.getDefaultMiner(plot) : Store.instance.getDefaultPVModule(plot);
+            if (BotAction.BuyMiner == buyAction)
+            {
+                Debug.Log("buy a miner");
+            }
+            else
+            {
+                Debug.Log("buy a pv module");
+            }
             bool isEnoughMoney = isSavingsSufficient(equipment, plotReport.cash);
             return isEnoughMoney ? buyAction : BotAction.Save;
         }
         else if (isSelfSustain) // already self sustainable so ship off excess electricity
         {
+            Debug.Log("Create a contract because the the plot is self sustainable and needs more cash");
             return BotAction.CreateContract;
         }
         else // save so you can invest in equipment
         {
+            Debug.Log("save");
             return BotAction.Save;
         }
     }
@@ -96,6 +106,7 @@ public class Scheduler: MonoBehaviour
     public bool shouldInvest(float cash, float equipmentValue)
     {
         float savingsRatio = cash / equipmentValue;
+        Debug.Log("Cash is " + cash + " and equipment value is " + equipmentValue + " and savings ratio is " + savingsRatio + " and cash ratio is " + cashRatio );
         return savingsRatio > cashRatio;
     }
 }

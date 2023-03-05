@@ -8,14 +8,26 @@ using Scripts;
  */
 public class PVModule : Equipment
 {
-    public int wattHours { get; private set; }
-    public int watts { get; private set; }
+    public int maxWattHours { get; private set; }
+    public int activeWattHours { get; private set; }
 
     public PVModule(float price, int wattHours, Plot plot, Sprite sprite) : base(price, plot, Type.PVModule, sprite)
     {
-        this.wattHours = wattHours;
-        this.watts = (int)(wattHours * (GameManager.instance.energyDataCollectPeriod / Constants.MIN_IN_HOUR));
+        this.maxWattHours = wattHours;
+        this.activeWattHours = wattHours;
+
         GameManager.instance.StartCoroutine(collectEnergy());
+        //Debug.Log("Created pv module with id " + instId);
+    }
+
+    public void shadePanel()
+    {
+        this.activeWattHours = 0;
+    }
+
+    public void unshadePanel()
+    {
+        this.activeWattHours = maxWattHours;
     }
 
     /// <summary>
@@ -23,7 +35,12 @@ public class PVModule : Equipment
     /// </summary>
     private IEnumerator collectEnergy()
     {
-        yield return new WaitForSeconds(GameManager.instance.energyDataCollectPeriod);
-        plot.changeSelfProducedEnergy(watts);
+        while (true)
+        {
+            yield return new WaitForSeconds(GameManager.instance.energyDataCollectPeriod);
+            plot.changeEnergyReserves(activeWattHours);
+            plot.addSelfGeneratedEnergy(activeWattHours);
+            //Debug.Log("PVModule " + instId + " generated " + activeWattHours + " watts");
+        }
     }
 }

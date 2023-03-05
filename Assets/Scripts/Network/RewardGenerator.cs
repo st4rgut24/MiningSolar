@@ -11,9 +11,9 @@ public class RewardGenerator : MonoBehaviour
     List<Miner> miners;
     public const float REWARD_SIZE = 6.5f;
 
-    public const float bitcoinExchangeRate = 23000; // exchange rate of bitcoin for dollars
+    public const float BITCOIN_PRICE = 23000; // exchange rate of bitcoin for dollars
 
-    private float blockTime = 600; // 10 minutes
+    private float blockTime = 10; // 10 minutes
 
     const int MAX_GUESS = 100000000;
     const int MIN_GUESS = 0;
@@ -36,6 +36,8 @@ public class RewardGenerator : MonoBehaviour
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
+
+            StartCoroutine(ChooseRandomWinner());
         }
     }
 
@@ -58,7 +60,7 @@ public class RewardGenerator : MonoBehaviour
     public float calculateProfits(float hashPower, float numBlocks)
     {
         float winningPct = hashPower / totalHashPower; // probability of creating the next block and getting reward
-        return winningPct * REWARD_SIZE * numBlocks * bitcoinExchangeRate;
+        return winningPct * REWARD_SIZE * numBlocks * BITCOIN_PRICE;
     }
 
     /// <summary>
@@ -66,10 +68,10 @@ public class RewardGenerator : MonoBehaviour
     /// </summary>
     /// <param name="miner">The new miner</param>
     public void addMiner(Miner miner) {
-        totalHashPower += miner.hashingPower;
-        if (miner.hashingPower < leastCommonHash)
+        totalHashPower += miner.maxHashingPower;
+        if (miner.maxHashingPower < leastCommonHash)
         {
-            leastCommonHash = miner.hashingPower;
+            leastCommonHash = miner.maxHashingPower;
         }
         miners.Add(miner);
     }
@@ -89,14 +91,28 @@ public class RewardGenerator : MonoBehaviour
 
             miners.ForEach(miner =>
             {
-                int guessCount = Mathf.FloorToInt(miner.hashingPower / leastCommonHash);
+                int guessCount = Mathf.FloorToInt(miner.maxHashingPower / leastCommonHash);
                 updateClosestGuess(miner, guessCount, ref closestDifference, ref closestMiner, luckyNum);
             });
             if (closestMiner != null)
             {
-                closestMiner.collectCoinbase(REWARD_SIZE);
+                closestMiner.collectCoinbase(REWARD_SIZE, BITCOIN_PRICE);
             }
         }
+    }
+
+    /// <summary>
+    /// Calculate expected reward in dollar denomination 
+    /// </summary>
+    /// <param name="chanceOfWinning">Pct chance of winning</param>
+    /// <returns>Reward in dollars</returns>
+    public float calculateReward(float chanceOfWinning)
+    {
+        if (chanceOfWinning > 1)
+        {
+            throw new System.Exception("Chance of winning can't be greater than 1");
+        }
+        return chanceOfWinning * BITCOIN_PRICE * REWARD_SIZE;
     }
 
     /// <summary>

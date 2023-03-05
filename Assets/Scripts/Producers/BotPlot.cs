@@ -18,7 +18,6 @@ public class BotPlot : Plot
     public List<BotAction> botPlotActionList { get; private set; }
 
     float selfSustainRatio;
-    float bitcoinProd;
 
     public BotPlot(Bot player, Vector2Int location, Plot prevAdjPlot, int proximity) : base(player, location, prevAdjPlot, proximity)
     {
@@ -72,7 +71,10 @@ public class BotPlot : Plot
         int contractDuration = Contract.getContractDuration();
         int surplusEnergy = plotReport.getSurplusEnergy();
         int wattsPerBlock = surplusEnergy / contractDuration;
-        float avgWattCost = plotReport.getAvgWattCost();
+
+        int activeWattProd = getEnergyProd();
+        float avgWattCost = plotReport.getAvgWattCost(activeWattProd);
+
         float price = avgWattCost * wattsPerBlock * contractDuration;
         return new Contract(wattsPerBlock, price, contractDuration, this);
     }
@@ -85,16 +87,12 @@ public class BotPlot : Plot
     {
         prevPlotReport = curPlotReport;
 
-        int prevEnergyProd = (prevPlotReport == null) ? 0 : prevPlotReport.cumEnergyProd;
-        int prevTotalEnergy = (prevPlotReport == null) ? 0 : prevPlotReport.cumTotalEnergy;
-        float prevBitcoinProd = (prevPlotReport == null) ? 0 : prevPlotReport.cumBitcoinProd;
+        int cumTotalEnergy = cumSelfProducedEnergy + cumImportedEnergy;
+        PlotReport.EnergyInfo energyStats = new PlotReport.EnergyInfo(cumSelfProducedEnergy, cumImportedEnergy, cumTotalEnergy, prevPlotReport);
         
-        int totalEnergy = getTotalEnergyProduction();
-        PlotReport.EnergyInfo energyStats = new PlotReport.EnergyInfo(selfProducedEnergy, prevEnergyProd, totalEnergy, prevTotalEnergy);
+        PlotReport.BitcoinInfo bitcoinStats = new PlotReport.BitcoinInfo(cumBitcoinProduced, prevPlotReport);
         
-        PlotReport.BitcoinInfo bitcoinStats = new PlotReport.BitcoinInfo(bitcoinProd, prevBitcoinProd);
-        
-        curPlotReport = new PlotReport(cashReserves, energyStats, bitcoinStats, miners, modules, selfSustainRatio, bot.analysisTimeFrame);
+        curPlotReport = new PlotReport(cashReserves, energyStats, bitcoinStats, miners, modules, bot.botProps);
         return curPlotReport;
     }
 }

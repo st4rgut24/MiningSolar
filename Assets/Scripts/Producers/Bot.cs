@@ -83,7 +83,7 @@ public class Bot : IPlayer
             return false;
         }
         int minerCapacity = PlotReport.getMinerCapacity(plot.miners, analysisTimeFrame);
-        int totalEnergyProd = plot.getTotalEnergyProduction();
+        int totalEnergyProd = plot.getEnergyProd();
         return totalEnergyProd < minerCapacity ? executeCostBenefitAnalysis(plotMiners, contract) : false;
     }
 
@@ -98,7 +98,7 @@ public class Bot : IPlayer
         Miner miner = plotMiners[0]; // representative miner, future improvement would be to use the average miner
         float theoreticalMinerCount = miner.energyUsage / contract.wattsPerHour;
         float minerCount = Mathf.Min(plotMiners.Count, theoreticalMinerCount);
-        float importedHashPower = miner.hashingPower * minerCount;
+        float importedHashPower = miner.maxHashingPower * minerCount;
         float futureRewards = RewardGenerator.instance.calculateProfits(importedHashPower, contract.getDuration());
         return futureRewards > contract.getEnergyCost();
     }

@@ -114,7 +114,7 @@ public class Store : MonoBehaviour
         Sprite sprite = getSpriteFromId(equipmentId);
         tile = new PlayerTile(player, equipmentType, plotLoc, equipment, sprite);
 
-        plot.changeCashReserves(equipment.price);
+        plot.changeCashReserves(-equipment.price);
         plot.addTile(plotLoc);
 
         player.buyItem(equipment.instId);
