@@ -6,7 +6,7 @@ using UnityEngine.Tilemaps;
 namespace Scripts { }
 public class GameTile
 {
-    public Vector2Int loc;
+    public Vector3Int loc;
 
     public Tile mapTile { get; private set; }
 
@@ -16,7 +16,9 @@ public class GameTile
     {
         Land,
         Player,
-        Weather
+        Weather,
+        Highlight,
+        None
     }
 
     public UnityEngine.Tilemaps.Tile getTile()
@@ -26,11 +28,12 @@ public class GameTile
         return tile;
     }
 
-    public GameTile(Vector2Int loc, Sprite sprite)
+    public GameTile(Vector2Int loc, Sprite sprite, GenericType type)
     {
-        this.loc = loc;
+        this.loc = loc.toVector3Int();
         mapTile = new Tile(loc, sprite);
         mapTile.sprite = sprite;
+        this.genericType = type;
     }
 
 }

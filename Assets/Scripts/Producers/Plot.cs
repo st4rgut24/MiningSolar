@@ -216,14 +216,15 @@ namespace Scripts
         }
 
         /// <summary>
-        /// Get a tile location that borders this plot
+        /// Get all tile locs border this plot that are eligible for a new tile
         /// </summary>
-        /// <param name="plot">The plot containing locations of its land</param>
-        /// <returns>the bordering tile location that extends this plot</returns>
-        public Vector2Int getAdjPlotLoc()
+        /// <returns>the list of eligible tile locations</returns>
+        public List<Vector2Int> getAdjPlotLocs()
         {
             List<Vector2Int> fourDir = new List<Vector2Int>() { Vector2Int.up, Vector2Int.left, Vector2Int.down, Vector2Int.right };
             List<Vector2Int> tiles = getTiles();
+            List<Vector2Int> eligibleTiles = new List<Vector2Int>();
+
             for (int i = 0; i < tiles.Count; i++)
             {
                 Vector2Int tile = tiles[i];
@@ -234,11 +235,33 @@ namespace Scripts
                     bool isBlocked = Map.isPlayerTileInBufferZone(adjTile, id) || Map.isTileOccupied(adjTile);
                     if (!isBlocked)
                     {
-                        return adjTile;
+                        eligibleTiles.Add(adjTile);
                     }
                 }
             }
-            return GameManager.instance.NullableLoc; // returrn a falsy vector2int value indicating the plot is landlocked
+            return eligibleTiles;
+        }
+
+        /// <summary>
+        /// Get a tile location that borders this plot
+        /// </summary>
+        /// <param name="plot">The plot containing locations of its land</param>
+        /// <returns>the bordering tile location that extends this plot</returns>
+        public Vector2Int getRandAdjPlotLoc()
+        {
+            List<Vector2Int> eligibleTileLocs = getAdjPlotLocs();
+            int randIdx = UnityEngine.Random.Range(0, eligibleTileLocs.Count);
+            return eligibleTileLocs[randIdx];
+        }
+
+        /// <summary>
+        /// Add a tile to this plot
+        /// </summary>
+        public void addEquipmentToPlot(Vector2Int plotLoc, Equipment equipment)
+        {
+            this.changeCashReserves(-equipment.price);
+            this.addTile(plotLoc);
+            Map.updateBoundingBox(plotLoc, boundingBox);
         }
 
         /// <summary>

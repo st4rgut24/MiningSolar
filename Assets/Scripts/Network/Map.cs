@@ -28,30 +28,30 @@ namespace Scripts
         }
 
         /// <summary>
-        /// When a new player tile is added, update the bounding box encompassing all plots if necessary
+        /// When a new player tile is added, update the bounding box encompassing all its tiles
         /// </summary>
         /// <param name="location">location of the newly added plot</param>
+        /// <param name="boundingBox">bounding box being updated</param>
         /// 
-        // TODO: If there's only one player this will be a  1 by 1 bounding box which is too small
-        private static void updateBoundingBox(Vector2Int location)
+        public static void updateBoundingBox(Vector2Int location, BoundingBox boundingBox)
         {
-            if (location.x < allPlotsBoundingBox.minX)
+            if (location.x < boundingBox.minX)
             {
-                allPlotsBoundingBox.setMinX(location.x);
+                boundingBox.setMinX(location.x);
             }
-            if (location.x > allPlotsBoundingBox.maxX)
+            if (location.x > boundingBox.maxX)
             {
-                allPlotsBoundingBox.setMaxX(location.x);
+                boundingBox.setMaxX(location.x);
             }
-            if (location.y < allPlotsBoundingBox.minY)
+            if (location.y < boundingBox.minY)
             {
-                allPlotsBoundingBox.setMinY(location.y);
+                boundingBox.setMinY(location.y);
             }
-            if (location.y > allPlotsBoundingBox.maxY)
+            if (location.y > boundingBox.maxY)
             {
-                allPlotsBoundingBox.setMaxY(location.y);
+                boundingBox.setMaxY(location.y);
             }
-            setMinBounds(allPlotsBoundingBox);
+            //setMinBounds(allPlotsBoundingBox);
         }
 
         /// <summary>
@@ -79,16 +79,16 @@ namespace Scripts
         /// <summary>
         /// Update vertices of box if the width/height is less than the minimum bounds
         /// </summary>
-        /// <param name="boundingBox">The bounding box</param>
-        private static void setMinBounds(BoundingBox boundingBox)
+        /// <param name="mapBoundingBox">The bounding box</param>
+        private static void setMinBounds(BoundingBox mapBoundingBox)
         {
-            if (boundingBox.width < MAP_WIDTH)
+            if (mapBoundingBox.width < MAP_WIDTH)
             {
-                boundingBox.increaseBoxWidth(MAP_WIDTH);
+                mapBoundingBox.increaseBoxWidth(MAP_WIDTH);
             }
-            if (boundingBox.height < MAP_HEIGHT)
+            if (mapBoundingBox.height < MAP_HEIGHT)
             {
-                boundingBox.increaseBoxHeight(MAP_HEIGHT);
+                mapBoundingBox.increaseBoxHeight(MAP_HEIGHT);
             }
         }
 
@@ -105,8 +105,24 @@ namespace Scripts
         public static WeatherTile addWeatherTile(WeatherTile tile)
         {
             weatherTileDict[tile.loc] = tile;
-            updateBoundingBox(tile.loc);
+            updateBoundingBox(tile.loc, allPlotsBoundingBox);
             return tile;
+        }
+
+        /// <summary>
+        /// Highlight tile locations
+        /// </summary>
+        /// <param name="tiles">a list of locations</param>
+        public static void toggleTileHighlight(List<Vector2Int>tiles, bool isHighlighted)
+        {
+            if (isHighlighted)
+            {
+                Draw.instance.highlightTiles(tiles);
+            }
+            else
+            {
+                Draw.instance.removeTiles(tiles);
+            }
         }
 
         /// <summary>
@@ -116,10 +132,10 @@ namespace Scripts
         /// <returns>true if player tile is added</returns>
         public static void addPlayerTile(PlayerTile tile)
         {
-            playerTileDict[tile.loc] = tile;
-            updateBoundingBox(tile.loc);
+            playerTileDict[tile.loc.toVector2Int()] = tile;
+            updateBoundingBox(tile.loc.toVector2Int(), allPlotsBoundingBox);
             // draw a land tile and the player sprite overlaid on it
-            Draw.instance.drawLandTile(tile.loc);
+            Draw.instance.drawLandTile(tile.loc.toVector2Int());
             Draw.instance.drawTile(tile);
         }
 

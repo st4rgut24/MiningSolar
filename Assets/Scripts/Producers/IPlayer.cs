@@ -13,7 +13,7 @@ public abstract class IPlayer: MonoBehaviour
 
     public string id;
 
-    protected List<Plot> plots;
+    public List<Plot> plots { get; private set; }
     protected string name;
 
     protected virtual void Awake()
@@ -23,7 +23,6 @@ public abstract class IPlayer: MonoBehaviour
 
     protected virtual void Start()
     {
-        this.plots = new List<Plot>();
         this.id = Guid.NewGuid().ToString();
     }
 
@@ -35,7 +34,7 @@ public abstract class IPlayer: MonoBehaviour
     {
         plots.Add(plot);
         this.buyItem(Equipment.Type.Miner, plot, plot.startingTile);
-        Vector2Int adjTileLoc = plot.getAdjPlotLoc();
+        Vector2Int adjTileLoc = plot.getRandAdjPlotLoc();
         this.buyItem(Equipment.Type.PVModule, plot, adjTileLoc); // a solar gets added to an adjacent tile
     }
 

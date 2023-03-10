@@ -7,10 +7,10 @@ using Scripts;
 public class Store : MonoBehaviour
 {
     [SerializeField]
-    string defaultMiner = AntminerS9.id;
+    public string defaultMiner = AntminerS9.id;
 
     [SerializeField]
-    string defaultModule = HiA375.id;
+    public string defaultModule = HiA375.id;
 
     //Sprites
 
@@ -83,7 +83,7 @@ public class Store : MonoBehaviour
     public void BuyItem(Equipment.Type equipmentType, IPlayer player, Plot plot, Vector2Int loc, string id=null)
     {
         // if no location is specified then choose a location adjacent to an existing player tile
-        Vector2Int plotLoc = loc.Equals(GameManager.instance.NullableLoc) ? plot.getAdjPlotLoc() : loc;
+        Vector2Int plotLoc = loc.Equals(GameManager.instance.NullableLoc) ? plot.getRandAdjPlotLoc() : loc;
         bool validTile = GameManager.instance.isValidTileLoc(plotLoc);
         if (!validTile)
         {
@@ -114,8 +114,7 @@ public class Store : MonoBehaviour
         Sprite sprite = getSpriteFromId(equipmentId);
         tile = new PlayerTile(player, equipmentType, plotLoc, equipment, sprite);
 
-        plot.changeCashReserves(-equipment.price);
-        plot.addTile(plotLoc);
+        plot.addEquipmentToPlot(plotLoc, equipment);
 
         player.buyItem(equipment.instId);
         Map.addPlayerTile(tile);

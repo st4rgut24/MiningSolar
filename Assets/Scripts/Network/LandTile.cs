@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class LandTile : GameTile
 {
-    public LandTile(Vector2Int loc, Sprite sprite) : base(loc, sprite)
+    public LandTile(Vector2Int loc, Sprite sprite) : base(loc, sprite, GenericType.Land)
     {
 
     }

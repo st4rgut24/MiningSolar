@@ -56,9 +56,13 @@
     <Analyzer Include="/Applications/Visual Studio.app/Contents/MonoBundle/Addins/MonoDevelop.Unity/Analyzers/Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets/Scripts/Test/CreateHumanBtnTest.cs" />
     <Compile Include="Assets/Scripts/Network/GameTile.cs" />
+    <Compile Include="Assets/Scripts/Producers/StoreCanvas.cs" />
+    <Compile Include="Assets/Scripts/Utils/VectorExtensions.cs" />
     <Compile Include="Assets/Scripts/Singleton.cs" />
     <Compile Include="Assets/Scripts/Producers/SolarSystem.cs" />
+    <Compile Include="Assets/Scripts/Network/HighlightTile.cs" />
     <Compile Include="Assets/Scripts/Producers/Player.cs" />
     <Compile Include="Assets/Scripts/Network/Land.cs" />
     <Compile Include="Assets/Scripts/Producers/IPlayer.cs" />
@@ -79,6 +83,7 @@
     <Compile Include="Assets/Scripts/Network/LandTile.cs" />
     <Compile Include="Assets/Scripts/Network/Map.cs" />
     <Compile Include="Assets/Scripts/Producers/Scheduler.cs" />
+    <Compile Include="Assets/Scripts/Utils/StaticCoroutine.cs" />
     <Compile Include="Assets/Scripts/Producers/HiA375.cs" />
     <Compile Include="Assets/Scripts/Producers/BotPlot.cs" />
     <Compile Include="Assets/Scripts/Network/LandGenerator.cs" />
@@ -95,7 +100,6 @@
     <Compile Include="Assets/Scripts/Network/PlotGenerator.cs" />
     <Compile Include="Assets/Scripts/Producers/Equipment.cs" />
     <Compile Include="Assets/Scripts/Network/RewardGenerator.cs" />
-    <Compile Include="Assets/Scripts/Utils/StaticCoroutine.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets/Scripts/Scripts.asmdef" />

@@ -33,6 +33,8 @@ public class PlayerManager : MonoBehaviour
 
     List<IPlayer> agents;
 
+    public Player humanPlayer;
+
     public class BotProps
     {
         public float selfSustainRatio { get; private set; }
@@ -101,6 +103,10 @@ public class PlayerManager : MonoBehaviour
         //player = isBot ? new Bot() : new Player(); (for testing)
         GameObject playerGo = isBot ? Instantiate(botPrefab) : Instantiate(playerPrefab);
         player = playerGo.GetComponent<IPlayer>();
+        if (!isBot)
+        {
+            humanPlayer = (Player)player;
+        }
         agents.Add(player);
         Plot plot = PlotGenerator.instance.GetPlot(player); // a miner gets added to the starting tile
         player.initializePlot(plot);

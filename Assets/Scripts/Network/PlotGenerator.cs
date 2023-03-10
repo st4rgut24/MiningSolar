@@ -58,8 +58,10 @@ namespace Scripts
         /// <summary>
         /// Get the eligible locations adjacent to an existing plot
         /// </summary>
+        /// <param name="buffer">distance to stay away from adjacent plot</param>
+        /// <param name="plot">the adjacent plot</param>
         /// <returns>The randomly chosen eligible location</returns>
-        private Vector2Int? getEligiblePlotLoc(int buffer, Plot plot)
+        private Vector2Int? getEligibleAdjPlotLoc(int buffer, Plot plot)
         {
             BoundingBox boundingBox = plot.boundingBox;
             List<Vector2Int> adjLocList = boundingBox.getAdjPlotLocs();
@@ -133,7 +135,7 @@ namespace Scripts
             while (plotLoc == null)
             {
                 // expand eligible tiles at least one tile beyond the buffer zone
-                plotLoc = this.getEligiblePlotLoc(buffer, plot);
+                plotLoc = this.getEligibleAdjPlotLoc(buffer, plot);
                 buffer += 1;
             }
 

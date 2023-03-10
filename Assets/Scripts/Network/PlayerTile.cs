@@ -21,7 +21,7 @@ public class PlayerTile : GameTile
     /// <param name="loc">location of tile</param>
     /// <param name="equipment">equipmnent located on tile if any</param>
     /// <param name="sprite">picture tile overlaid on land</param>
-    public PlayerTile(IPlayer player, Equipment.Type tileType, Vector2Int loc, Equipment equipment = null, Sprite sprite = null) : base(loc, sprite)
+    public PlayerTile(IPlayer player, Equipment.Type tileType, Vector2Int loc, Equipment equipment = null, Sprite sprite = null) : base(loc, sprite, GenericType.Player)
     {
         this.player = player;
         this.type = tileType;
